@@ -92,6 +92,7 @@ contract GDAExplo {
     //              /____/
 
     function createPool() external {
+        if (msg.sender != admin) revert FORBIDDEN();
         pool = gda.createPool(currency, address(this));
     }
 
