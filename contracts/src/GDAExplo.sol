@@ -13,8 +13,6 @@ import {ISuperToken} from "@superfluid-finance/ethereum-contracts/contracts/inte
 import {ISuperfluidPool} from
     "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluidPool.sol";
 import {SuperTokenV1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
-import {IGeneralDistributionAgreementV1} from
-    "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IGeneralDistributionAgreementV1.sol";
 
 /// @dev errors thrown when attempting to perform forbidden operation
 error FORBIDDEN();
@@ -36,9 +34,6 @@ contract GDAExplo {
 
     /// @dev Superfluid pool holding the tokens paid to subscribers
     ISuperfluidPool public pool;
-
-    IGeneralDistributionAgreementV1 public gda =
-        IGeneralDistributionAgreementV1(0xe87F46A15C410F151309Bf7516e130087Fc6a5E5);
 
     //     ______                 __                  __
     //    / ____/___  ____  _____/ /________  _______/ /_____  _____
@@ -93,7 +88,12 @@ contract GDAExplo {
 
     function createPool() external {
         if (msg.sender != admin) revert FORBIDDEN();
-        pool = gda.createPool(currency, address(this));
+        pool = currency.createPool(address(this));
+    }
+
+    function setPool(address _pool) external {
+        if (msg.sender != admin) revert FORBIDDEN();
+        pool = ISuperfluidPool(_pool);
     }
 
     function startStream(int96 _flowRate) external {
