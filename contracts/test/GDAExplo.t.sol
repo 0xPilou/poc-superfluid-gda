@@ -30,8 +30,13 @@ contract GDAExploTest is Test {
         alice = payable(vm.addr(1));
         vm.deal(alice, 100 ether);
 
-        mockToken =
-        new MockSuperToken(SF_HOST, SF_CONSTANT_OUTFLOW_NFT, SF_CONSTANT_INFLOW_NFT, SF_POOL_ADMIN_NFT, SF_POOL_MEMBER_NFT);
+        mockToken = new MockSuperToken(
+            SF_HOST,
+            SF_CONSTANT_OUTFLOW_NFT,
+            SF_CONSTANT_INFLOW_NFT,
+            SF_POOL_ADMIN_NFT,
+            SF_POOL_MEMBER_NFT
+        );
 
         gdaExplo = new GDAExplo(address(mockToken));
 
@@ -43,7 +48,7 @@ contract GDAExploTest is Test {
     function test_addUnit() public {
         // gdaExplo.createPool();
 
-        address pool = address(mockToken.createPool(address(gdaExplo)));
+        address pool = address(mockToken.createPool(alice));
         gdaExplo.setPool(pool);
 
         vm.prank(alice);

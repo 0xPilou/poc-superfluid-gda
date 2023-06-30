@@ -4,12 +4,12 @@ pragma solidity ^0.8.13;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import {MockSuperToken} from "src/MockSuperToken.sol";
-import {GDAExplo2} from "src/GDAExplo2.sol";
+import {GDAExploNoLibrary} from "src/GDAExploNoLibrary.sol";
 import {SuperTokenV1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
 import {ISuperfluidPool} from
     "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluidPool.sol";
 
-contract GDAExplo2Test is Test {
+contract GDAExploNoLibraryTest is Test {
     using SuperTokenV1Library for MockSuperToken;
 
     address public constant SF_HOST = 0xE40983C2476032A0915600b9472B3141aA5B5Ba9;
@@ -21,7 +21,7 @@ contract GDAExplo2Test is Test {
 
     address payable public alice;
 
-    GDAExplo2 public gdaExplo;
+    GDAExploNoLibrary public gdaExplo;
     MockSuperToken public mockToken;
 
     function setUp() public {
@@ -38,7 +38,7 @@ contract GDAExplo2Test is Test {
             SF_POOL_MEMBER_NFT
         );
 
-        gdaExplo = new GDAExplo2(address(mockToken));
+        gdaExplo = new GDAExploNoLibrary(address(mockToken));
 
         vm.label(alice, "alice");
         vm.label(address(mockToken), "mockToken");

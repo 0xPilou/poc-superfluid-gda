@@ -2,7 +2,7 @@
 pragma solidity ^0.8.18;
 
 /**
- * @title GDAExplo2
+ * @title GDAExploNoLibrary
  * @author 0xPilou
  * @notice Exploration around Superfluid General Distribution Agreement
  *
@@ -22,7 +22,7 @@ import {IGeneralDistributionAgreementV1} from
 
 error FORBIDDEN();
 
-contract GDAExplo2 {
+contract GDAExploNoLibrary {
     // //     _____ __        __
     // //    / ___// /_____ _/ /____  _____
     // //    \__ \/ __/ __ `/ __/ _ \/ ___/
