@@ -45,22 +45,14 @@ contract GDAExploTest is Test {
         vm.label(address(gdaExplo), "gdaExplo");
     }
 
-    function test_addUnit() public {
-        // gdaExplo.createPool();
-
-        address pool = address(mockToken.createPool(alice));
-        gdaExplo.setPool(pool);
-
-        vm.prank(alice);
-
-        gdaExplo.addUnit();
+    function test_createPool() public {
+        gdaExplo.createPool();
     }
 
-    // function test_createPool() public {
-    //     gdaExplo.createPool();
+    function test_addUnit() public {
+        gdaExplo.createPool();
 
-    //     console.logAddress(address(gdaExplo.pool()));
-
-    //     console.logUint(gdaExplo.pool().getTotalUnits());
-    // }
+        vm.prank(alice);
+        gdaExplo.addUnit();
+    }
 }

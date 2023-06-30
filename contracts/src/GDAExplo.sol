@@ -91,25 +91,8 @@ contract GDAExplo {
         pool = currency.createPool(address(this));
     }
 
-    function setPool(address _pool) external {
-        if (msg.sender != admin) revert FORBIDDEN();
-        pool = ISuperfluidPool(_pool);
-    }
-
     function startStream(int96 _flowRate) external {
         if (msg.sender != admin) revert FORBIDDEN();
         currency.distributeFlow(address(this), pool, _flowRate);
     }
-
-    //   _    ___                 ______                 __  _
-    //  | |  / (_)__ _      __   / ____/_  ______  _____/ /_(_)___  ____  _____
-    //  | | / / / _ \ | /| / /  / /_  / / / / __ \/ ___/ __/ / __ \/ __ \/ ___/
-    //  | |/ / /  __/ |/ |/ /  / __/ / /_/ / / / / /__/ /_/ / /_/ / / / (__  )
-    //  |___/_/\___/|__/|__/  /_/    \__,_/_/ /_/\___/\__/_/\____/_/ /_/____/
-
-    //     ____      __                        __   ______                 __  _
-    //    /  _/___  / /____  _________  ____ _/ /  / ____/_  ______  _____/ /_(_)___  ____  _____
-    //    / // __ \/ __/ _ \/ ___/ __ \/ __ `/ /  / /_  / / / / __ \/ ___/ __/ / __ \/ __ \/ ___/
-    //  _/ // / / / /_/  __/ /  / / / / /_/ / /  / __/ / /_/ / / / / /__/ /_/ / /_/ / / / (__  )
-    // /___/_/ /_/\__/\___/_/  /_/ /_/\__,_/_/  /_/    \__,_/_/ /_/\___/\__/_/\____/_/ /_/____/
 }
