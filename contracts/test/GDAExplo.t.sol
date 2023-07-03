@@ -8,6 +8,8 @@ import {GDAExplo} from "src/GDAExplo.sol";
 import {SuperTokenV1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
 import {ISuperfluidPool} from
     "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluidPool.sol";
+import {ISuperfluidToken} from
+    "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluidToken.sol";
 
 contract GDAExploTest is Test {
     using SuperTokenV1Library for MockSuperToken;
@@ -20,6 +22,7 @@ contract GDAExploTest is Test {
     address public constant SF_GDA = 0xe87F46A15C410F151309Bf7516e130087Fc6a5E5;
 
     address payable public alice;
+    address payable public bob;
 
     GDAExplo public gdaExplo;
     MockSuperToken public mockToken;
@@ -29,6 +32,9 @@ contract GDAExploTest is Test {
 
         alice = payable(vm.addr(1));
         vm.deal(alice, 100 ether);
+
+        bob = payable(vm.addr(2));
+        vm.deal(bob, 100 ether);
 
         mockToken = new MockSuperToken(
             SF_HOST,
@@ -41,18 +47,52 @@ contract GDAExploTest is Test {
         gdaExplo = new GDAExplo(address(mockToken));
 
         vm.label(alice, "alice");
+        vm.label(bob, "bob");
         vm.label(address(mockToken), "mockToken");
         vm.label(address(gdaExplo), "gdaExplo");
     }
 
     function test_createPool() public {
         gdaExplo.createPool();
+        ISuperfluidPool pool = gdaExplo.pool();
+
+        assertFalse(address(pool) == address(0));
+        assertEq(address(pool.superToken()), address(mockToken));
+        assertEq(pool.admin(), address(gdaExplo));
     }
 
     function test_addUnit() public {
         gdaExplo.createPool();
+        ISuperfluidPool pool = gdaExplo.pool();
 
         vm.prank(alice);
         gdaExplo.addUnit();
+
+        assertEq(pool.getUnits(alice), 1);
+    }
+
+    function test_startStream() public {
+        gdaExplo.createPool();
+        ISuperfluidPool pool = gdaExplo.pool();
+
+        mockToken.mint(address(gdaExplo), 1_000_000e18);
+
+        vm.prank(alice);
+        gdaExplo.addUnit();
+
+        vm.startPrank(bob);
+        gdaExplo.addUnit();
+        gdaExplo.addUnit();
+        gdaExplo.addUnit();
+        vm.stopPrank();
+
+        console.logUint(pool.getUnits(bob));
+        console.logUint(pool.getUnits(alice));
+
+        gdaExplo.startStream(1_000);
+
+        console.logInt(pool.getMemberFlowRate(alice));
+
+        console.logInt(pool.getMemberFlowRate(bob));
     }
 }

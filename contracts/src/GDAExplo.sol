@@ -9,12 +9,19 @@ pragma solidity ^0.8.18;
  */
 
 /* Superfluid Contracts */
-import {ISuperToken} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperToken.sol";
+import {
+    ISuperToken,
+    ISuperfluidToken
+} from "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperToken.sol";
 import {ISuperfluidPool} from
     "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluidPool.sol";
+import {IGeneralDistributionAgreementV1} from
+    "@superfluid-finance/ethereum-contracts/contracts/interfaces/agreements/IGeneralDistributionAgreementV1.sol";
+
 import {SuperTokenV1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
 
 /// @dev errors thrown when attempting to perform forbidden operation
+
 error FORBIDDEN();
 
 contract GDAExplo {
@@ -34,6 +41,10 @@ contract GDAExplo {
 
     /// @dev Superfluid pool holding the tokens paid to subscribers
     ISuperfluidPool public pool;
+
+    /// @dev Superfluid General Distribution Agreement interface
+    IGeneralDistributionAgreementV1 public gda =
+        IGeneralDistributionAgreementV1(0xe87F46A15C410F151309Bf7516e130087Fc6a5E5);
 
     //     ______                 __                  __
     //    / ____/___  ____  _____/ /________  _______/ /_____  _____
@@ -59,8 +70,6 @@ contract GDAExplo {
     function addUnit() external {
         // Get the subscriber's current units
         uint128 callerUnits = pool.getUnits(msg.sender);
-
-        currency.connectPool(pool);
 
         // Add 1 unit to the caller's current units amount
         pool.updateMember(msg.sender, callerUnits + 1);
@@ -88,11 +97,16 @@ contract GDAExplo {
 
     function createPool() external {
         if (msg.sender != admin) revert FORBIDDEN();
-        pool = currency.createPool(address(this));
+        pool = gda.createPool(address(this), currency);
     }
 
     function startStream(int96 _flowRate) external {
         if (msg.sender != admin) revert FORBIDDEN();
-        currency.distributeFlow(address(this), pool, _flowRate);
+        currency.distributeFlow(address(this), pool, _flowRate, new bytes(0));
+    }
+
+    function startDistribution(uint256 _amount) external {
+        if (msg.sender != admin) revert FORBIDDEN();
+        currency.distribute(address(this), pool, _amount, new bytes(0));
     }
 }
