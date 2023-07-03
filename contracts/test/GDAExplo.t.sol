@@ -53,8 +53,10 @@ contract GDAExploTest is Test {
     }
 
     function test_createPool() public {
-        gdaExplo.createPool();
-        ISuperfluidPool pool = gdaExplo.pool();
+        uint256 poolId = 1;
+
+        gdaExplo.createPool(poolId);
+        ISuperfluidPool pool = gdaExplo.pools(poolId);
 
         assertFalse(address(pool) == address(0));
         assertEq(address(pool.superToken()), address(mockToken));
@@ -62,37 +64,37 @@ contract GDAExploTest is Test {
     }
 
     function test_addUnit() public {
-        gdaExplo.createPool();
-        ISuperfluidPool pool = gdaExplo.pool();
+        uint256 poolId = 1;
+
+        gdaExplo.createPool(poolId);
+        ISuperfluidPool pool = gdaExplo.pools(poolId);
 
         vm.prank(alice);
-        gdaExplo.addUnit();
+        gdaExplo.addUnit(poolId);
 
         assertEq(pool.getUnits(alice), 1);
     }
 
     function test_startStream() public {
-        gdaExplo.createPool();
-        ISuperfluidPool pool = gdaExplo.pool();
+        uint256 poolId = 1;
+
+        gdaExplo.createPool(poolId);
+        ISuperfluidPool pool = gdaExplo.pools(poolId);
 
         mockToken.mint(address(gdaExplo), 1_000_000e18);
 
         vm.prank(alice);
-        gdaExplo.addUnit();
+        gdaExplo.addUnit(poolId);
 
         vm.startPrank(bob);
-        gdaExplo.addUnit();
-        gdaExplo.addUnit();
-        gdaExplo.addUnit();
+        gdaExplo.addUnit(poolId);
+        gdaExplo.addUnit(poolId);
+        gdaExplo.addUnit(poolId);
         vm.stopPrank();
 
-        console.logUint(pool.getUnits(bob));
-        console.logUint(pool.getUnits(alice));
+        gdaExplo.startStream(poolId, 1_000);
 
-        gdaExplo.startStream(1_000);
-
-        console.logInt(pool.getMemberFlowRate(alice));
-
-        console.logInt(pool.getMemberFlowRate(bob));
+        assertEq(pool.getMemberFlowRate(alice), 1_000 * 1 / 4);
+        assertEq(pool.getMemberFlowRate(bob), 1_000 * 3 / 4);
     }
 }

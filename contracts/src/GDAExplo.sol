@@ -40,7 +40,7 @@ contract GDAExplo {
     ISuperToken public currency;
 
     /// @dev Superfluid pool holding the tokens paid to subscribers
-    ISuperfluidPool public pool;
+    mapping(uint256 _poolId => ISuperfluidPool pool) public pools;
 
     /// @dev Superfluid General Distribution Agreement interface
     IGeneralDistributionAgreementV1 public gda =
@@ -67,7 +67,10 @@ contract GDAExplo {
     //  / /____>  </ /_/  __/ /  / / / / /_/ / /  / __/ / /_/ / / / / /__/ /_/ / /_/ / / / (__  )
     // /_____/_/|_|\__/\___/_/  /_/ /_/\__,_/_/  /_/    \__,_/_/ /_/\___/\__/_/\____/_/ /_/____/
 
-    function addUnit() external {
+    function addUnit(uint256 _poolId) external {
+        // Get the pool corresponding to _poolId
+        ISuperfluidPool pool = pools[_poolId];
+
         // Get the subscriber's current units
         uint128 callerUnits = pool.getUnits(msg.sender);
 
@@ -75,7 +78,10 @@ contract GDAExplo {
         pool.updateMember(msg.sender, callerUnits + 1);
     }
 
-    function removeUnit() external {
+    function removeUnit(uint256 _poolId) external {
+        // Get the pool corresponding to _poolId
+        ISuperfluidPool pool = pools[_poolId];
+
         // Get the subscriber's current units
         uint128 callerUnits = pool.getUnits(msg.sender);
 
@@ -95,18 +101,13 @@ contract GDAExplo {
     // \____/_/ /_/_/\__, /  /_/  |_\__,_/_/ /_/ /_/_/_/ /_/
     //              /____/
 
-    function createPool() external {
+    function createPool(uint256 _poolId) external {
         if (msg.sender != admin) revert FORBIDDEN();
-        pool = gda.createPool(address(this), currency);
+        pools[_poolId] = gda.createPool(address(this), currency);
     }
 
-    function startStream(int96 _flowRate) external {
+    function startStream(uint256 _poolId, int96 _flowRate) external {
         if (msg.sender != admin) revert FORBIDDEN();
-        currency.distributeFlow(address(this), pool, _flowRate, new bytes(0));
-    }
-
-    function startDistribution(uint256 _amount) external {
-        if (msg.sender != admin) revert FORBIDDEN();
-        currency.distribute(address(this), pool, _amount, new bytes(0));
+        currency.distributeFlow(address(this), pools[_poolId], _flowRate, new bytes(0));
     }
 }
