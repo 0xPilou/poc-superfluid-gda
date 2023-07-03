@@ -51,15 +51,8 @@ contract GDAExploNoPoolCreationTest is Test {
         vm.label(address(gdaExplo), "gdaExplo");
     }
 
-    function test_setPool1() public {
-        address pool = address(mockToken.createPool(address(gdaExplo)));
-        gdaExplo.setPool(pool);
-
-        assertEq(pool, address(gdaExplo.pool()));
-    }
-
     function test_setPool2() public {
-        address pool = address(gda.createPool(mockToken, address(gdaExplo)));
+        address pool = address(gda.createPool(address(gdaExplo), mockToken));
         gdaExplo.setPool(pool);
 
         assertEq(pool, address(gdaExplo.pool()));

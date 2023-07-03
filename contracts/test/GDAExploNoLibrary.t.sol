@@ -8,6 +8,8 @@ import {GDAExploNoLibrary} from "src/GDAExploNoLibrary.sol";
 import {SuperTokenV1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
 import {ISuperfluidPool} from
     "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluidPool.sol";
+import {ISuperfluidToken} from
+    "@superfluid-finance/ethereum-contracts/contracts/interfaces/superfluid/ISuperfluidToken.sol";
 
 contract GDAExploNoLibraryTest is Test {
     using SuperTokenV1Library for MockSuperToken;
@@ -47,11 +49,29 @@ contract GDAExploNoLibraryTest is Test {
 
     function test_createPool() public {
         gdaExplo.createPool();
+        ISuperfluidPool pool = gdaExplo.pool();
+
+        assertFalse(address(pool) == address(0));
+        assertEq(address(pool.superToken()), address(mockToken));
+        assertEq(pool.admin(), address(gdaExplo));
     }
 
     function test_addUnit() public {
         gdaExplo.createPool();
+        ISuperfluidPool pool = gdaExplo.pool();
+
         vm.prank(alice);
         gdaExplo.addUnit();
+
+        assertEq(pool.getUnits(alice), 1);
+    }
+
+    function test_startStream() public {
+        gdaExplo.createPool();
+        ISuperfluidPool pool = gdaExplo.pool();
+        vm.prank(alice);
+        gdaExplo.addUnit();
+
+        gdaExplo.startStream(1_000);
     }
 }
