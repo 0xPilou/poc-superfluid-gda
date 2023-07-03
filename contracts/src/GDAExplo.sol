@@ -21,7 +21,6 @@ import {IGeneralDistributionAgreementV1} from
 import {SuperTokenV1Library} from "@superfluid-finance/ethereum-contracts/contracts/apps/SuperTokenV1Library.sol";
 
 /// @dev errors thrown when attempting to perform forbidden operation
-
 error FORBIDDEN();
 
 contract GDAExplo {
@@ -67,7 +66,7 @@ contract GDAExplo {
     //  / /____>  </ /_/  __/ /  / / / / /_/ / /  / __/ / /_/ / / / / /__/ /_/ / /_/ / / / (__  )
     // /_____/_/|_|\__/\___/_/  /_/ /_/\__,_/_/  /_/    \__,_/_/ /_/\___/\__/_/\____/_/ /_/____/
 
-    function addUnit(uint256 _poolId) external {
+    function addUnit(uint256 _poolId, uint256 _amount) external {
         // Get the pool corresponding to _poolId
         ISuperfluidPool pool = pools[_poolId];
 
@@ -75,19 +74,19 @@ contract GDAExplo {
         uint128 callerUnits = pool.getUnits(msg.sender);
 
         // Add 1 unit to the caller's current units amount
-        pool.updateMember(msg.sender, callerUnits + 1);
+        pool.updateMember(msg.sender, callerUnits + _amount);
     }
 
-    function removeUnit(uint256 _poolId) external {
+    function removeUnit(uint256 _poolId, uint128 _amount) external {
         // Get the pool corresponding to _poolId
         ISuperfluidPool pool = pools[_poolId];
 
         // Get the subscriber's current units
         uint128 callerUnits = pool.getUnits(msg.sender);
 
-        if (callerUnits > 1) {
+        if (callerUnits > _amount) {
             // Remove 1 unit from the caller's current units amount
-            pool.updateMember(msg.sender, callerUnits - 1);
+            pool.updateMember(msg.sender, callerUnits - _amount);
         } else {
             // Delete the caller's subscription
             pool.updateMember(msg.sender, 0);

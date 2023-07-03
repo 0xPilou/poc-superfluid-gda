@@ -65,18 +65,21 @@ contract GDAExploTest is Test {
 
     function test_addUnit() public {
         uint256 poolId = 1;
+        uint128 amount = 2;
 
         gdaExplo.createPool(poolId);
         ISuperfluidPool pool = gdaExplo.pools(poolId);
 
         vm.prank(alice);
-        gdaExplo.addUnit(poolId);
+        gdaExplo.addUnit(poolId, amount);
 
-        assertEq(pool.getUnits(alice), 1);
+        assertEq(pool.getUnits(alice), amount);
     }
 
     function test_startStream() public {
         uint256 poolId = 1;
+        uint128 amountAlice = 1;
+        uint128 amountBob = 3;
 
         gdaExplo.createPool(poolId);
         ISuperfluidPool pool = gdaExplo.pools(poolId);
@@ -84,13 +87,10 @@ contract GDAExploTest is Test {
         mockToken.mint(address(gdaExplo), 1_000_000e18);
 
         vm.prank(alice);
-        gdaExplo.addUnit(poolId);
+        gdaExplo.addUnit(poolId, amountAlice);
 
-        vm.startPrank(bob);
-        gdaExplo.addUnit(poolId);
-        gdaExplo.addUnit(poolId);
-        gdaExplo.addUnit(poolId);
-        vm.stopPrank();
+        vm.prank(bob);
+        gdaExplo.addUnit(poolId, amountBob);
 
         gdaExplo.startStream(poolId, 1_000);
 
