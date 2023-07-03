@@ -66,7 +66,7 @@ contract GDAExplo {
     //  / /____>  </ /_/  __/ /  / / / / /_/ / /  / __/ / /_/ / / / / /__/ /_/ / /_/ / / / (__  )
     // /_____/_/|_|\__/\___/_/  /_/ /_/\__,_/_/  /_/    \__,_/_/ /_/\___/\__/_/\____/_/ /_/____/
 
-    function addUnit(uint256 _poolId, uint256 _amount) external {
+    function addUnit(uint256 _poolId, uint128 _amount) external {
         // Get the pool corresponding to _poolId
         ISuperfluidPool pool = pools[_poolId];
 
@@ -91,6 +91,20 @@ contract GDAExplo {
             // Delete the caller's subscription
             pool.updateMember(msg.sender, 0);
         }
+    }
+
+    function claimPayout() external {
+        pools[_poolId].claimAll(msg.sender);
+    }
+
+    //   _    ___                 ______                 __  _
+    //  | |  / (_)__ _      __   / ____/_  ______  _____/ /_(_)___  ____  _____
+    //  | | / / / _ \ | /| / /  / /_  / / / / __ \/ ___/ __/ / __ \/ __ \/ ___/
+    //  | |/ / /  __/ |/ |/ /  / __/ / /_/ / / / / /__/ /_/ / /_/ / / / (__  )
+    //  |___/_/\___/|__/|__/  /_/    \__,_/_/ /_/\___/\__/_/\____/_/ /_/____/
+
+    function getClaimableAmount(uint256 _poolId, address _user) external returns (int256 claimable) {
+        (claimable,) = pools[_poolId].getClaimableNow(_user);
     }
 
     //    ____        __         ___       __          _
